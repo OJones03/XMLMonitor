@@ -43,7 +43,11 @@ export function parseNmapXml(xmlString) {
 
 /* ── Host normalisation ──────────────────────────────────────── */
 
-function normaliseHost(raw) {
+/**
+ * @param {object} raw       Raw host object from the XML parser
+ * @param {object} fileMeta  Metadata extracted from the filename
+ */
+function normaliseHost(raw, fileMeta = {}) {
   const status = raw.status?.["@_state"] ?? "unknown";
   const addresses = normaliseArray(raw.address);
 
@@ -63,7 +67,6 @@ function normaliseHost(raw) {
 
   const ip = ipEntry?.["@_addr"] ?? "";
 
-  // ── Derived fields ─────────────────────────────────────────
   // Subnet: /24 derived from IPv4 (e.g. 192.168.1.0/24)
   const subnet = deriveSubnet(ip);
 
@@ -71,14 +74,10 @@ function normaliseHost(raw) {
   const rawTs = raw["@_starttime"];
   const scanTime = rawTs ? new Date(Number(rawTs) * 1000).toISOString() : null;
 
-  // Site name: DNS domain suffix of the first FQDN
-  // e.g. "dc01.corp.local" → "corp.local"
-  const siteName = deriveSiteName(hostnames);
-
-  // Site code: uppercase prefix before the first "-" in the hostname label
-  // e.g. "NYC-DC01.corp.local" → "NYC"
-  // Falls back to the first DNS label if no dash present.
-  const siteCode = deriveSiteCode(hostnames);
+  // Site name & code: prefer values derived from hostname DNS labels;
+  // fall back to what was embedded in the filename.
+  const siteName = deriveSiteName(hostnames) || fileMeta.siteName || "";
+  const siteCode = deriveSiteCode(hostnames) || fileMeta.siteCode || "";
 
   return {
     status,
@@ -186,6 +185,51 @@ function buildSummary(hosts) {
 function normaliseArray(val) {
   if (val == null) return [];
   return Array.isArray(val) ? val : [val];
+}
+
+/**
+ * Parse the filename convention: (sitecode)#(sitename)#(ip)#(timestamp).xml
+ * Returns an object with siteCode, siteName, scanIp, timestamp.
+ * Any segment that is missing or unparseable is returned as an empty string.
+ *
+ * Examples:
+ *   "NYC#corp.local#192.168.1.0#20250303120000.xml"
+ *     → { siteCode:"NYC", siteName:"corp.local", scanIp:"192.168.1.0", timestamp:"2025-03-03T12:00:00.000Z" }
+ *
+ *   "plainname.xml" or "" → all fields empty string
+ */
+function parseFilename(filename) {
+  const empty = { siteCode: "", siteName: "", scanIp: "", timestamp: "" };
+  if (!filename) return empty;
+
+  // Strip directory path and extension
+  const base = filename.replace(/\.xml$/i, "").replace(/.*[\\/]/, "");
+  const parts = base.split("#");
+
+  if (parts.length < 2) return empty; // not the expected convention
+
+  const [siteCode = "", siteName = "", scanIp = "", rawTs = ""] = parts;
+
+  // Parse timestamp: expect YYYYMMDDHHmmss (14 digits) or YYYYMMDDHHmm (12)
+  let timestamp = "";
+  const ts = rawTs.replace(/\D/g, ""); // strip any non-digits
+  if (ts.length >= 12) {
+    const y  = ts.slice(0, 4);
+    const mo = ts.slice(4, 6);
+    const d  = ts.slice(6, 8);
+    const h  = ts.slice(8, 10);
+    const mi = ts.slice(10, 12);
+    const s  = ts.slice(12, 14) || "00";
+    const parsed = new Date(`${y}-${mo}-${d}T${h}:${mi}:${s}`);
+    if (!isNaN(parsed)) timestamp = parsed.toISOString();
+  }
+
+  return {
+    siteCode: siteCode.trim().toUpperCase(),
+    siteName: siteName.trim(),
+    scanIp:   scanIp.trim(),
+    timestamp,
+  };
 }
 
 /** Derive a /24 subnet string from an IPv4 address. */

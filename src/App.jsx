@@ -30,7 +30,7 @@ export default function App() {
   const handleLoadXml = useCallback((xmlString, filename) => {
     try {
       setParseError(null);
-      const result = parseNmapXml(xmlString);
+      const result = parseNmapXml(xmlString, filename);
       setScanResult(result);
       setCurrentFile(filename);
       setSelectedHost(null);
