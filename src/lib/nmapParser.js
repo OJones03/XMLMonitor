@@ -1,4 +1,4 @@
-/**
+﻿/**
  * nmapParser.js
  * ─────────────
  * Converts raw Nmap XML into a normalised JSON structure.
@@ -22,20 +22,29 @@ const parserOptions = {
  * @param {string} xmlString  Raw XML content from an Nmap scan
  * @returns {import("./types").ScanResult}
  */
-export function parseNmapXml(xmlString) {
+export function parseNmapXml(xmlString, filename = "") {
   const parser = new XMLParser(parserOptions);
   const json = parser.parse(xmlString);
 
   const nmaprun = json.nmaprun;
   if (!nmaprun) throw new Error("Invalid Nmap XML – missing <nmaprun> root element.");
 
-  const hosts = normaliseArray(nmaprun.host).map(normaliseHost);
+  // Extract site metadata from filename before processing hosts
+  const fileMeta = parseFilename(filename);
+
+  const hosts = normaliseArray(nmaprun.host).map((raw) =>
+    normaliseHost(raw, fileMeta)
+  );
 
   return {
     scanner: nmaprun["@_scanner"] ?? "nmap",
     args: nmaprun["@_args"] ?? "",
     startTime: nmaprun["@_startstr"] ?? "",
     version: nmaprun["@_version"] ?? "",
+    fileSiteCode: fileMeta.siteCode,
+    fileSiteName: fileMeta.siteName,
+    fileScanIp:   fileMeta.scanIp,
+    fileTimestamp: fileMeta.timestamp,
     hosts,
     summary: buildSummary(hosts),
   };
@@ -74,10 +83,11 @@ function normaliseHost(raw, fileMeta = {}) {
   const rawTs = raw["@_starttime"];
   const scanTime = rawTs ? new Date(Number(rawTs) * 1000).toISOString() : null;
 
-  // Site name & code: prefer values derived from hostname DNS labels;
-  // fall back to what was embedded in the filename.
-  const siteName = deriveSiteName(hostnames) || fileMeta.siteName || "";
-  const siteCode = deriveSiteCode(hostnames) || fileMeta.siteCode || "";
+  // Site name & code: filename is the authoritative source (set by the operator
+  // who named the file).  Only fall back to hostname-derived values when the
+  // filename does not follow the naming convention.
+  const siteName = fileMeta.siteName || deriveSiteName(hostnames) || "";
+  const siteCode = fileMeta.siteCode || deriveSiteCode(hostnames) || "";
 
   return {
     status,
