@@ -1,0 +1,23 @@
+services:
+  xmlmonitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: xmlmonitor
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    volumes:
+      # Bind-mount your local scan directory into the container.
+      # Change ./scans to any absolute or relative path on the host.
+      - ./scans:/scans:ro
+    environment:
+      - PORT=3001
+      - SCANS_DIR=/scans
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/api/scans"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

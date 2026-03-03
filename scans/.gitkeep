@@ -1,0 +1,3 @@
+# Place Nmap XML scan files here.
+# This directory is bind-mounted into the Docker container at /scans.
+# Files are served via GET /api/scans and picked in the dashboard sidebar.

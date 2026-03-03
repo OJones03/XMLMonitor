@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<nmaprun scanner="nmap" args="nmap -sV -sC -O -A 192.168.1.0/24" start="1709472000" startstr="Mon Mar 03 12:00:00 2025" version="7.94" xmloutputversion="1.05">
+  <host starttime="1709472001" endtime="1709472060">
+    <status state="up" reason="echo-reply" reason_ttl="64"/>
+    <address addr="192.168.1.1" addrtype="ipv4"/>
+    <address addr="AA:BB:CC:DD:EE:01" addrtype="mac" vendor="Cisco"/>
+    <hostnames>
+      <hostname name="LON-GATEWAY.corp.local" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack" reason_ttl="64"/>
+        <service name="ssh" product="OpenSSH" version="8.9p1" extrainfo="Ubuntu Linux; protocol 2.0" method="probed" conf="10"/>
+        <script id="ssh-hostkey" output="2048 SHA256:abc123... (RSA)&#10;256 SHA256:def456... (ECDSA)&#10;256 SHA256:ghi789... (ED25519)"/>
+        <script id="ssh-auth-methods" output="Supported authentication methods: publickey,password"/>
+      </port>
+      <port protocol="tcp" portid="80">
+        <state state="open" reason="syn-ack" reason_ttl="64"/>
+        <service name="http" product="nginx" version="1.24.0" method="probed" conf="10"/>
+        <script id="http-title" output="Cisco Router Admin Panel"/>
+        <script id="http-server-header" output="nginx/1.24.0"/>
+      </port>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack" reason_ttl="64"/>
+        <service name="https" product="nginx" version="1.24.0" tunnel="ssl" method="probed" conf="10"/>
+        <script id="ssl-cert" output="Subject: CN=gateway.local&#10;Issuer: CN=Local CA&#10;Validity: 2024-01-01 to 2026-01-01"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Cisco IOS 15.x" accuracy="95">
+        <osclass type="router" vendor="Cisco" osfamily="IOS" osgen="15.X"/>
+      </osmatch>
+    </os>
+    <uptime seconds="8640000" lastboot="Mon Jan 06 12:00:00 2025"/>
+  </host>
+
+  <host starttime="1709472002" endtime="1709472070">
+    <status state="up" reason="echo-reply" reason_ttl="128"/>
+    <address addr="192.168.1.10" addrtype="ipv4"/>
+    <address addr="AA:BB:CC:DD:EE:10" addrtype="mac" vendor="Dell"/>
+    <hostnames>
+      <hostname name="LON-WEB01.corp.local" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="ssh" product="OpenSSH" version="9.3p1" extrainfo="Debian; protocol 2.0" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="80">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="http" product="Apache httpd" version="2.4.57" method="probed" conf="10"/>
+        <script id="http-title" output="Apache2 Debian Default Page"/>
+      </port>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="https" product="Apache httpd" version="2.4.57" tunnel="ssl" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="3306">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="mysql" product="MySQL" version="8.0.35" method="probed" conf="10"/>
+        <script id="mysql-info" output="Protocol: 10&#10;Version: 8.0.35&#10;Thread ID: 42&#10;Status: Autocommit"/>
+      </port>
+      <port protocol="tcp" portid="8080">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="http-proxy" product="Apache Tomcat" version="10.1.16" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="25">
+        <state state="filtered" reason="no-response" reason_ttl="0"/>
+        <service name="smtp" method="table" conf="3"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Linux 5.15 - 6.1" accuracy="98">
+        <osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="5.X"/>
+      </osmatch>
+      <osmatch name="Debian 12" accuracy="92">
+        <osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="6.X"/>
+      </osmatch>
+    </os>
+    <uptime seconds="2592000" lastboot="Sun Feb 02 12:00:00 2025"/>
+  </host>
+
+  <host starttime="1709472003" endtime="1709472080">
+    <status state="up" reason="echo-reply" reason_ttl="128"/>
+    <address addr="192.168.1.20" addrtype="ipv4"/>
+    <address addr="AA:BB:CC:DD:EE:20" addrtype="mac" vendor="Microsoft"/>
+    <hostnames>
+      <hostname name="NYC-DC01.corp.local" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="53">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="domain" product="Microsoft DNS" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="88">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="kerberos-sec" product="Microsoft Windows Kerberos" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="135">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="msrpc" product="Microsoft Windows RPC" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="389">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="ldap" product="Microsoft Windows Active Directory LDAP" version="10.0.20348" method="probed" conf="10"/>
+        <script id="ldap-rootdse" output="namingContexts: DC=corp,DC=local&#10;defaultNamingContext: DC=corp,DC=local&#10;serverName: CN=DC01,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=corp,DC=local"/>
+      </port>
+      <port protocol="tcp" portid="445">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="microsoft-ds" product="Microsoft Windows Server 2022" method="probed" conf="10"/>
+        <script id="smb2-security-mode" output="Message signing enabled and required"/>
+        <script id="smb-os-discovery" output="OS: Windows Server 2022 Standard 20348&#10;Computer name: DC01&#10;Domain name: corp.local&#10;FQDN: dc01.corp.local"/>
+      </port>
+      <port protocol="tcp" portid="3389">
+        <state state="open" reason="syn-ack" reason_ttl="128"/>
+        <service name="ms-wbt-server" product="Microsoft Terminal Services" method="probed" conf="10"/>
+        <script id="rdp-ntlm-info" output="Target Name: CORP&#10;Product Version: 10.0.20348"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Microsoft Windows Server 2022" accuracy="99">
+        <osclass type="server" vendor="Microsoft" osfamily="Windows" osgen="2022"/>
+      </osmatch>
+    </os>
+    <uptime seconds="5184000" lastboot="Sun Jan 05 12:00:00 2025"/>
+  </host>
+
+  <host starttime="1709472004" endtime="1709472090">
+    <status state="up" reason="echo-reply" reason_ttl="64"/>
+    <address addr="192.168.1.50" addrtype="ipv4"/>
+    <address addr="AA:BB:CC:DD:EE:50" addrtype="mac" vendor="VMware"/>
+    <hostnames>
+      <hostname name="NYC-REDIS01.corp.local" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack" reason_ttl="64"/>
+        <service name="ssh" product="OpenSSH" version="9.6p1" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="6379">
+        <state state="open" reason="syn-ack" reason_ttl="64"/>
+        <service name="redis" product="Redis key-value store" version="7.2.4" method="probed" conf="10"/>
+        <script id="redis-info" output="redis_version:7.2.4&#10;os:Linux 6.1.0-17-amd64 x86_64&#10;connected_clients:12&#10;used_memory_human:64.3M"/>
+      </port>
+      <port protocol="tcp" portid="9090">
+        <state state="open" reason="syn-ack" reason_ttl="64"/>
+        <service name="http" product="Prometheus" version="2.48.1" method="probed" conf="10"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Linux 6.1" accuracy="96">
+        <osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="6.X"/>
+      </osmatch>
+    </os>
+  </host>
+
+  <host starttime="1709472005" endtime="1709472095">
+    <status state="down" reason="no-response" reason_ttl="0"/>
+    <address addr="192.168.1.100" addrtype="ipv4"/>
+    <hostnames/>
+    <ports/>
+  </host>
+
+  <host starttime="1709472006" endtime="1709472100">
+    <status state="up" reason="echo-reply" reason_ttl="64"/>
+    <address addr="192.168.1.200" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="NYC-MONGO01.corp.local" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack" reason_ttl="64"/>
+        <service name="ssh" product="OpenSSH" version="9.2p1" extrainfo="Debian; protocol 2.0" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="27017">
+        <state state="open" reason="syn-ack" reason_ttl="64"/>
+        <service name="mongodb" product="MongoDB" version="7.0.4" method="probed" conf="10"/>
+        <script id="mongodb-info" output="MongoDB server status:&#10;version: 7.0.4&#10;uptime: 1209600&#10;connections: { current: 28 }"/>
+        <script id="mongodb-databases" output="admin - 0.004GB&#10;config - 0.001GB&#10;local - 0.002GB&#10;production - 12.8GB"/>
+      </port>
+      <port protocol="tcp" portid="5432">
+        <state state="closed" reason="reset" reason_ttl="64"/>
+        <service name="postgresql" method="table" conf="3"/>
+      </port>
+    </ports>
+    <os>
+      <osmatch name="Linux 6.1" accuracy="97">
+        <osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="6.X"/>
+      </osmatch>
+    </os>
+  </host>
+</nmaprun>
