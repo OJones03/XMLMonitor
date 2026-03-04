@@ -4,3 +4,5 @@ dist
 .gitignore
 *.md
 .env*
+eslint.config.js
+scans/

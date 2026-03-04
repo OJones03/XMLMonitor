@@ -48,7 +48,7 @@ export default function App() {
           <div className="flex items-center gap-3">
             <Radar className="h-6 w-6 text-sky-400" />
             <span className="text-lg font-bold tracking-tight">
-              XML<span className="text-sky-400">Monitor</span>
+              ELEMENT<span className="text-sky-400">Monitor</span>
             </span>
           </div>
 
