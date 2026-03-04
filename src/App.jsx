@@ -119,6 +119,8 @@ export default function App() {
                 sortAsc={sortAsc}
                 toggleSort={toggleSort}
                 onSelect={setSelectedHost}
+                siteName={scanResult.fileSiteName}
+                siteCode={scanResult.fileSiteCode}
               />
             </section>
           </>

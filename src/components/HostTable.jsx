@@ -1,4 +1,4 @@
-import { ChevronUp, ChevronDown, Eye } from "lucide-react";
+import { ChevronUp, ChevronDown, Eye, MapPin, Tag } from "lucide-react";
 
 /**
  * Sortable host table.
@@ -7,15 +7,14 @@ import { ChevronUp, ChevronDown, Eye } from "lucide-react";
  *  - hosts – filtered + sorted host array
  *  - sortKey / sortAsc / toggleSort – sorting state
  *  - onSelect(host) – callback when "View Details" is clicked
+ *  - siteName / siteCode – shown once above the table
  */
-export default function HostTable({ hosts, sortKey, sortAsc, toggleSort, onSelect }) {
+export default function HostTable({ hosts, sortKey, sortAsc, toggleSort, onSelect, siteName, siteCode }) {
   const columns = [
     { key: "status",   label: "Status",    width: "w-24" },
     { key: "ip",       label: "IP Address", width: "" },
     { key: "subnet",   label: "Subnet",     width: "w-36" },
     { key: "hostname", label: "Hostname",   width: "" },
-    { key: "siteName", label: "Site Name",  width: "w-32" },
-    { key: "siteCode", label: "Site Code",  width: "w-24" },
     { key: "scanTime", label: "Timestamp",  width: "w-36" },
     { key: "ports",    label: "Open Ports", width: "w-28" },
     { key: null,       label: "",            width: "w-28" },
@@ -31,6 +30,25 @@ export default function HostTable({ hosts, sortKey, sortAsc, toggleSort, onSelec
 
   return (
     <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60 backdrop-blur">
+      {/* ── Site banner ───────────────────────────────────── */}
+      {(siteName || siteCode) && (
+        <div className="flex items-center gap-4 border-b border-slate-800 bg-slate-800/40 px-5 py-2.5">
+          {siteName && (
+            <span className="flex items-center gap-1.5 text-xs text-violet-300">
+              <MapPin className="h-3.5 w-3.5 text-violet-400" />
+              <span className="font-medium text-slate-400">Site:</span>
+              <span className="rounded-full bg-violet-400/10 px-2 py-0.5">{siteName}</span>
+            </span>
+          )}
+          {siteCode && (
+            <span className="flex items-center gap-1.5 text-xs text-amber-300">
+              <Tag className="h-3.5 w-3.5 text-amber-400" />
+              <span className="font-medium text-slate-400">Code:</span>
+              <span className="rounded-full bg-amber-400/10 px-2 py-0.5 font-semibold">{siteCode}</span>
+            </span>
+          )}
+        </div>
+      )}
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-slate-800 text-xs font-medium uppercase tracking-wider text-slate-500">
@@ -85,24 +103,6 @@ export default function HostTable({ hosts, sortKey, sortAsc, toggleSort, onSelec
                 {/* Hostname */}
                 <td className="px-5 py-3 text-slate-400">
                   {host.hostnames[0] || "—"}
-                </td>
-
-                {/* Site Name */}
-                <td className="px-5 py-3 text-slate-400 text-xs">
-                  {host.siteName ? (
-                    <span className="inline-flex items-center rounded-full bg-violet-400/10 px-2 py-0.5 text-violet-300">
-                      {host.siteName}
-                    </span>
-                  ) : "—"}
-                </td>
-
-                {/* Site Code */}
-                <td className="px-5 py-3">
-                  {host.siteCode ? (
-                    <span className="inline-flex items-center rounded-full bg-amber-400/10 px-2 py-0.5 text-xs font-semibold text-amber-300">
-                      {host.siteCode}
-                    </span>
-                  ) : "—"}
                 </td>
 
                 {/* Timestamp */}

@@ -218,7 +218,7 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
                   onChange={(e) => setFilterSiteCode(e.target.value)}
                   className={`rounded-lg border px-2 py-1.5 text-xs outline-none transition focus:ring-1 focus:ring-sky-500/40 ${
                     filterSiteCode
-                      ? "border-sky-700 bg-sky-900/30 text-sky-300"
+                      ? "border-blue-500 bg-blue-900 text-white"
                       : "border-slate-700 bg-slate-900/80 text-slate-300"
                   }`}
                 >
@@ -237,7 +237,7 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
                   onChange={(e) => setFilterSiteName(e.target.value)}
                   className={`rounded-lg border px-2 py-1.5 text-xs outline-none transition focus:ring-1 focus:ring-sky-500/40 ${
                     filterSiteName
-                      ? "border-sky-700 bg-sky-900/30 text-sky-300"
+                      ? "border-blue-500 bg-blue-900 text-white"
                       : "border-slate-700 bg-slate-900/80 text-slate-300"
                   }`}
                 >
@@ -256,7 +256,7 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
                 onChange={(e) => setFilterDateFrom(e.target.value)}
                 className={`rounded-lg border px-2 py-1.5 text-xs outline-none transition focus:ring-1 focus:ring-sky-500/40 [color-scheme:dark] ${
                   filterDateFrom
-                    ? "border-sky-700 bg-sky-900/30 text-sky-300"
+                    ? "border-blue-500 bg-blue-900 text-white"
                     : "border-slate-700 bg-slate-900/80 text-slate-300"
                 }`}
               />
@@ -271,7 +271,7 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
                 onChange={(e) => setFilterDateTo(e.target.value)}
                 className={`rounded-lg border px-2 py-1.5 text-xs outline-none transition focus:ring-1 focus:ring-sky-500/40 [color-scheme:dark] ${
                   filterDateTo
-                    ? "border-sky-700 bg-sky-900/30 text-sky-300"
+                    ? "border-blue-500 bg-blue-900 text-white"
                     : "border-slate-700 bg-slate-900/80 text-slate-300"
                 }`}
               />
