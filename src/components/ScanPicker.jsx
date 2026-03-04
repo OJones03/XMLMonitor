@@ -136,7 +136,7 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
     filterOptions.siteCodes.length > 0 || filterOptions.siteNames.length > 0 || files.length > 0;
 
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/60 backdrop-blur overflow-hidden">
+    <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden">
       {/* ── Header ───────────────────────────────────────────── */}
       <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3 gap-2">
         {/* Toggle buttons */}

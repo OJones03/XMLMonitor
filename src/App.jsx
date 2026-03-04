@@ -43,7 +43,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       {/* ── Navbar ─────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950">
         <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-6 py-3">
           <div className="flex items-center gap-3">
             <Radar className="h-6 w-6 text-sky-400" />

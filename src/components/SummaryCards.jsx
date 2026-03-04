@@ -48,7 +48,7 @@ export default function SummaryCards({ summary }) {
       {cards.map((c) => (
         <div
           key={c.label}
-          className="animate-fade-in flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900/60 p-5 backdrop-blur"
+          className="animate-fade-in flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900 p-5"
         >
           <div className={`rounded-lg p-2.5 ${c.bg}`}>
             <c.icon className={`h-5 w-5 ${c.color}`} />
@@ -66,7 +66,7 @@ export default function SummaryCards({ summary }) {
 
       {/* OS Distribution mini-card */}
       {summary.osDistribution.length > 0 && (
-        <div className="animate-fade-in flex items-start gap-4 rounded-xl border border-slate-800 bg-slate-900/60 p-5 backdrop-blur sm:col-span-2 lg:col-span-1">
+        <div className="animate-fade-in flex items-start gap-4 rounded-xl border border-slate-800 bg-slate-900 p-5 sm:col-span-2 lg:col-span-1">
           <div className="rounded-lg bg-violet-400/10 p-2.5">
             <MonitorSmartphone className="h-5 w-5 text-violet-400" />
           </div>

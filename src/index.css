@@ -43,4 +43,5 @@
 
 .animate-pulse-dot {
   animation: pulse-dot 2s ease-in-out infinite;
+  will-change: opacity;
 }

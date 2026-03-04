@@ -28,7 +28,7 @@ export default function HostTable({ hosts, sortKey, sortAsc, toggleSort, onSelec
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60 backdrop-blur">
+    <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900">
       {/* ── Site banner ───────────────────────────────────── */}
       {(siteName || siteCode) && (
         <div className="flex items-center gap-4 border-b border-slate-800 bg-slate-800/40 px-5 py-2.5">
