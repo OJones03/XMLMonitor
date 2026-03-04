@@ -1,4 +1,35 @@
-import { ChevronUp, ChevronDown, MapPin, Tag } from "lucide-react";
+import { ChevronUp, ChevronDown, MapPin, Tag, Download } from "lucide-react";
+
+function downloadCsv(hosts, siteName, siteCode) {
+  const headers = ["Site Code", "Site Name", "Status", "IP Address", "Subnet", "Hostname", "Timestamp", "Open Ports"];
+
+  const escape = (v) => {
+    const s = String(v ?? "");
+    return s.includes(",") || s.includes('"') || s.includes("\n")
+      ? `"${s.replace(/"/g, '""')}"`
+      : s;
+  };
+
+  const rows = hosts.map((h) => [
+    siteCode ?? "",
+    siteName ? siteName.replace(/_/g, " ") : "",
+    h.status,
+    h.ip,
+    h.subnet ?? "",
+    h.hostnames[0] ?? "",
+    h.scanTime ? new Date(h.scanTime).toLocaleString() : "",
+    h.ports.filter((p) => p.state === "open").length,
+  ]);
+
+  const csv = [headers, ...rows].map((r) => r.map(escape).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${siteCode || "scan"}_hosts_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 /**
  * Sortable host table.
@@ -46,6 +77,14 @@ export default function HostTable({ hosts, sortKey, sortAsc, toggleSort, onSelec
               <span className="rounded-full bg-amber-400/10 px-2 py-0.5 font-semibold">{siteCode}</span>
             </span>
           )}
+          <button
+            onClick={() => downloadCsv(hosts, siteName, siteCode)}
+            title="Download table as CSV"
+            className="ml-auto flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1 text-xs text-slate-400 transition hover:border-emerald-600 hover:text-emerald-400"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Export CSV
+          </button>
         </div>
       )}
       <table className="w-full text-left text-sm">
