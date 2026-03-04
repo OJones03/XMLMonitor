@@ -1,4 +1,4 @@
-import { ChevronUp, ChevronDown, Eye, MapPin, Tag } from "lucide-react";
+import { ChevronUp, ChevronDown, MapPin, Tag } from "lucide-react";
 
 /**
  * Sortable host table.
@@ -17,7 +17,6 @@ export default function HostTable({ hosts, sortKey, sortAsc, toggleSort, onSelec
     { key: "hostname", label: "Hostname",   width: "" },
     { key: "scanTime", label: "Timestamp",  width: "w-36" },
     { key: "ports",    label: "Open Ports", width: "w-28" },
-    { key: null,       label: "",            width: "w-28" },
   ];
 
   if (hosts.length === 0) {
@@ -37,7 +36,7 @@ export default function HostTable({ hosts, sortKey, sortAsc, toggleSort, onSelec
             <span className="flex items-center gap-1.5 text-xs text-violet-300">
               <MapPin className="h-3.5 w-3.5 text-violet-400" />
               <span className="font-medium text-slate-400">Site:</span>
-              <span className="rounded-full bg-violet-400/10 px-2 py-0.5">{siteName}</span>
+              <span className="rounded-full bg-violet-400/10 px-2 py-0.5">{siteName.replace(/_/g, " ")}</span>
             </span>
           )}
           {siteCode && (
@@ -110,27 +109,17 @@ export default function HostTable({ hosts, sortKey, sortAsc, toggleSort, onSelec
                   {host.scanTime ? formatTs(host.scanTime) : "—"}
                 </td>
 
-                {/* Open Ports count */}
+                {/* Open Ports — clicking opens detail panel */}
                 <td className="px-5 py-3">
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      openPorts > 0
-                        ? "bg-sky-400/10 text-sky-400"
-                        : "bg-slate-800 text-slate-500"
-                    }`}
-                  >
-                    {openPorts}
-                  </span>
-                </td>
-
-                {/* Actions */}
-                <td className="px-5 py-3 text-right">
                   <button
                     onClick={() => onSelect(host)}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:border-sky-500 hover:text-sky-400"
+                    className={`inline-flex items-center rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                      openPorts > 0
+                        ? "border-sky-700 bg-sky-400/10 text-sky-400 hover:border-sky-400 hover:bg-sky-400/20"
+                        : "border-slate-700 bg-slate-800 text-slate-500 hover:border-slate-500 hover:text-slate-300"
+                    }`}
                   >
-                    <Eye className="h-3.5 w-3.5" />
-                    Details
+                    {openPorts} {openPorts === 1 ? "port" : "ports"}
                   </button>
                 </td>
               </tr>
