@@ -6,7 +6,7 @@ import { useHostFilter } from "./hooks/useHostFilter";
 import ScanPicker from "./components/ScanPicker";
 import SummaryCards from "./components/SummaryCards";
 import SearchBar from "./components/SearchBar";
-import FilterBar from "./components/FilterBar";
+
 import HostTable from "./components/HostTable";
 import HostDetail from "./components/HostDetail";
 
@@ -23,7 +23,6 @@ export default function App() {
   const hosts = scanResult?.hosts ?? [];
   const {
     query, setQuery,
-    filters, setFilter, clearFilters, activeFilterCount,
     sorted, sortKey, sortAsc, toggleSort,
   } = useHostFilter(hosts);
 
@@ -77,7 +76,7 @@ export default function App() {
         {/* Widget: Two-column layout — Scan Picker sidebar + main content */}
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
           {/* ── Sidebar: Scan file picker ───────────────── */}
-          <div className="w-full lg:w-80 lg:shrink-0">
+          <div className="w-full lg:w-96 lg:shrink-0">
             <ScanPicker onLoadXml={handleLoadXml} currentFile={currentFile} />
             {parseError && (
               <p className="mt-3 rounded-lg border border-red-900 bg-red-950/40 px-4 py-3 text-sm text-red-400">
@@ -114,13 +113,6 @@ export default function App() {
             {/* Widget: Search + Filters + Table */}
             <section className="space-y-4">
               <SearchBar value={query} onChange={setQuery} />
-              <FilterBar
-                hosts={hosts}
-                filters={filters}
-                setFilter={setFilter}
-                clearFilters={clearFilters}
-                activeFilterCount={activeFilterCount}
-              />
               <HostTable
                 hosts={sorted}
                 sortKey={sortKey}

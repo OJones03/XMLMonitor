@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 
 /**
- * Top-level summary cards: Total Hosts, Up/Down, Critical Ports, OS Distribution.
+ * Top-level summary cards: Total Hosts, Up/Down, Open Ports, OS Distribution.
  */
 export default function SummaryCards({ summary }) {
   if (!summary) return null;
@@ -35,7 +35,7 @@ export default function SummaryCards({ summary }) {
       bg: "bg-rose-400/10",
     },
     {
-      label: "Critical Ports",
+      label: "Open Ports",
       value: summary.criticalPortCount,
       icon: ShieldAlert,
       color: "text-amber-400",
