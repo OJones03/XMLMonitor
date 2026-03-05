@@ -5,6 +5,7 @@ import { parseNmapXml } from "./lib/nmapParser";
 import { useHostFilter } from "./hooks/useHostFilter";
 
 import ScanPicker from "./components/ScanPicker";
+import ActiveScans from "./components/ActiveScans";
 import SummaryCards from "./components/SummaryCards";
 import SearchBar from "./components/SearchBar";
 
@@ -105,6 +106,7 @@ export default function App() {
           {/* ── Sidebar: Scan file picker ───────────────── */}
           <div className="w-full lg:w-96 lg:shrink-0">
             <ScanPicker onLoadXml={handleLoadXml} currentFile={currentFile} />
+            <ActiveScans />
             {parseError && (
               <p className="mt-3 rounded-lg border border-red-900 bg-red-950/40 px-4 py-3 text-sm text-red-400">
                 {parseError}
