@@ -1,11 +1,9 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { Clock, Archive, RefreshCw, FileText, AlertCircle, ChevronRight, SlidersHorizontal, X } from "lucide-react";
 
-const ONE_HOUR_MS = 60 * 60 * 1000;
-
 /**
  * Parse structured metadata encoded in the filename.
- * Expected format: SITECODE#SiteName#IP#Timestamp.xml
+ * Expected format: SITECODE#SiteName#IP#LATEST.xml (latest) or SITECODE#SiteName#IP#Timestamp.xml (archived)
  */
 function parseFileMeta(name) {
   const base = name.replace(/\.xml$/i, "");
@@ -121,10 +119,9 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
     setFilterDateTo("");
   }
 
-  // Split filtered files into latest (≤1 hour old) and archived (>1 hour old)
-  const now = Date.now();
-  const latestFiles   = filteredFiles.filter((f) => now - new Date(f.modified).getTime() <= ONE_HOUR_MS);
-  const archivedFiles = filteredFiles.filter((f) => now - new Date(f.modified).getTime() >  ONE_HOUR_MS);
+  // Split filtered files: names ending with #LATEST.xml are latest; everything else is archived
+  const latestFiles   = filteredFiles.filter((f) => f.name.endsWith("#LATEST.xml"));
+  const archivedFiles = filteredFiles.filter((f) => !f.name.endsWith("#LATEST.xml"));
 
   // If the active file is in the archive, auto-switch to the archived tab
   const activeIsArchived = archivedFiles.some((f) => f.name === currentFile);
@@ -344,14 +341,14 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
             ) : resolvedTab === "latest" ? (
               <>
                 <Clock className="h-6 w-6 text-slate-700" />
-                <p className="text-sm text-slate-500">No recent files.</p>
-                <p className="text-xs text-slate-600">All scans are over an hour old — switch to Archived.</p>
+                <p className="text-sm text-slate-500">No latest scans.</p>
+                <p className="text-xs text-slate-600">Files named with <code className="text-slate-400">#LATEST.xml</code> will appear here.</p>
               </>
             ) : (
               <>
                 <Archive className="h-6 w-6 text-slate-700" />
-                <p className="text-sm text-slate-500">No archived files yet.</p>
-                <p className="text-xs text-slate-600">Files older than 1 hour will appear here.</p>
+                <p className="text-sm text-slate-500">No archived scans.</p>
+                <p className="text-xs text-slate-600">Files not ending in <code className="text-slate-400">#LATEST.xml</code> will appear here.</p>
               </>
             )}
           </div>
