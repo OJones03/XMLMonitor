@@ -5,10 +5,10 @@ const POLL_INTERVAL_MS = 10_000; // refresh every 10 seconds
 
 /**
  * Parse metadata from an in-progress filename.
- * Expected format: SITECODE#SiteName#IP#In_Progress.xml
+ * Expected format: SITECODE#SiteName#IP#IN_PROGRESS.xml
  */
 function parseInProgressMeta(name) {
-  const base = name.replace(/#In_Progress\.xml$/i, "");
+  const base = name.replace(/#IN_PROGRESS\.xml$/i, "");
   const parts = base.split("#");
   return {
     siteCode: parts[0] || null,
@@ -20,7 +20,7 @@ function parseInProgressMeta(name) {
 /**
  * ActiveScans
  * ───────────
- * Polls /api/scans and displays any file ending with #In_Progress.xml.
+ * Polls /api/scans and displays any file ending with #IN_PROGRESS.xml.
  * Always visible — shows an idle state when no scans are running.
  */
 export default function ActiveScans() {
@@ -33,7 +33,7 @@ export default function ActiveScans() {
       if (!res.ok) return;
       const data = await res.json();
       const inProgress = (data.files ?? []).filter((f) =>
-        f.name.endsWith("#In_Progress.xml")
+        f.name.endsWith("#IN_PROGRESS.xml")
       );
       setActiveScans(inProgress);
     } catch {
