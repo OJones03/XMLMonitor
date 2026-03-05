@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Radar, Github, LogOut } from "lucide-react";
+import { Radar, LogOut } from "lucide-react";
 import LoginPage from "./components/LoginPage";
 import { parseNmapXml } from "./lib/nmapParser";
 import { useHostFilter } from "./hooks/useHostFilter";
@@ -86,20 +86,6 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-3 text-xs text-slate-500">
-            {scanResult && (
-              <span className="hidden sm:inline">
-                {scanResult.scanner} {scanResult.version} — {scanResult.args.slice(0, 60)}
-                {scanResult.args.length > 60 && "…"}
-              </span>
-            )}
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-lg p-1.5 transition hover:bg-slate-800 hover:text-slate-300"
-            >
-              <Github className="h-4 w-4" />
-            </a>
             <button
               onClick={handleLogout}
               title="Sign out"
