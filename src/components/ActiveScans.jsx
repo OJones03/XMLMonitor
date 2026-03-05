@@ -90,12 +90,14 @@ export default function ActiveScans() {
         <ul className="divide-y divide-slate-800/60">
           {activeScans.map((file) => {
             const { siteCode, siteName, ip } = parseInProgressMeta(file.name);
+            const displayName = siteName ? siteName.replaceAll("_", " ") : (siteCode ?? file.name);
+            const displayIp = ip ? ip.replace(/_(\d+)$/, "/$1").replaceAll("_", ".") : null;
             return (
               <li key={file.name} className="flex items-center gap-3 px-4 py-3">
                 <Server className="h-4 w-4 shrink-0 text-amber-500" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-slate-200">
-                    {siteName ?? siteCode ?? file.name}
+                    {displayName}
                   </p>
                   <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-0.5">
                     {siteCode && (
@@ -103,9 +105,9 @@ export default function ActiveScans() {
                         Code: <span className="text-slate-400">{siteCode}</span>
                       </span>
                     )}
-                    {ip && (
+                    {displayIp && (
                       <span className="text-[11px] text-slate-500">
-                        IP: <span className="font-mono text-slate-400">{ip}</span>
+                        IP: <span className="font-mono text-slate-400">{displayIp}</span>
                       </span>
                     )}
                   </div>

@@ -387,7 +387,10 @@ function FilterChip({ label, value, onRemove }) {
 
 function FileRow({ file, isActive, isFetching, onSelect, muted = false }) {
   const meta = parseFileMeta(file.name);
-  const displayIp = meta.ip ? meta.ip.replace(/_24$/, "/24") : null;
+  const displayName = meta.siteName ? meta.siteName.replaceAll("_", " ") : file.name;
+  const displayIp = meta.ip
+    ? meta.ip.replace(/_([\d]+)$/, "/$1").replaceAll("_", ".")
+    : null;
 
   return (
     <button
@@ -412,7 +415,7 @@ function FileRow({ file, isActive, isFetching, onSelect, muted = false }) {
       )}
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{file.name}</p>
+        <p className="truncate text-sm font-medium">{displayName}</p>
         {muted ? (
           <p className="text-xs text-slate-500">{formatDate(file.modified)}</p>
         ) : (
