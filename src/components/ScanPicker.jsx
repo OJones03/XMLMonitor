@@ -386,6 +386,9 @@ function FilterChip({ label, value, onRemove }) {
 /* ── FileRow sub-component ───────────────────────────────── */
 
 function FileRow({ file, isActive, isFetching, onSelect, muted = false }) {
+  const meta = parseFileMeta(file.name);
+  const displayIp = meta.ip ? meta.ip.replace(/_24$/, "/24") : null;
+
   return (
     <button
       onClick={() => !isFetching && onSelect(file.name)}
@@ -410,9 +413,15 @@ function FileRow({ file, isActive, isFetching, onSelect, muted = false }) {
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{file.name}</p>
-        <p className="text-xs text-slate-500">
-          {formatBytes(file.size)} · {formatDate(file.modified)}
-        </p>
+        {muted ? (
+          <p className="text-xs text-slate-500">{formatDate(file.modified)}</p>
+        ) : (
+          <p className="text-xs text-slate-500">
+            {meta.siteCode && <span>Code: <span className="text-slate-400">{meta.siteCode}</span></span>}
+            {meta.siteCode && displayIp && <span className="mx-1.5">·</span>}
+            {displayIp && <span>IP: <span className="font-mono text-slate-400">{displayIp}</span></span>}
+          </p>
+        )}
       </div>
 
       <ChevronRight
@@ -425,12 +434,6 @@ function FileRow({ file, isActive, isFetching, onSelect, muted = false }) {
 }
 
 /* ── Helpers ─────────────────────────────────────────────── */
-
-function formatBytes(bytes) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 function formatDate(iso) {
   const d = new Date(iso);
