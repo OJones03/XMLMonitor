@@ -119,9 +119,12 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
     setFilterDateTo("");
   }
 
+  // Exclude in-progress files — they are shown in the ActiveScans panel
+  const pickableFiles = filteredFiles.filter((f) => !f.name.endsWith("#IN_PROGRESS.xml"));
+
   // Split filtered files: names ending with #LATEST.xml are latest; everything else is archived
-  const latestFiles   = filteredFiles.filter((f) => f.name.endsWith("#LATEST.xml"));
-  const archivedFiles = filteredFiles.filter((f) => !f.name.endsWith("#LATEST.xml"));
+  const latestFiles   = pickableFiles.filter((f) => f.name.endsWith("#LATEST.xml"));
+  const archivedFiles = pickableFiles.filter((f) => !f.name.endsWith("#LATEST.xml"));
 
   // If the active file is in the archive, auto-switch to the archived tab
   const activeIsArchived = archivedFiles.some((f) => f.name === currentFile);
