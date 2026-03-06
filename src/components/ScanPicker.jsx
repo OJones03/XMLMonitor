@@ -127,10 +127,12 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
   const archivedFiles = pickableFiles.filter((f) => !f.name.endsWith("#LATEST.xml"));
 
   // If the active file is in the archive, auto-switch to the archived tab
-  const activeIsArchived = archivedFiles.some((f) => f.name === currentFile);
-  const resolvedTab = activeIsArchived ? "archived" : activeTab;
+  useEffect(() => {
+    const isArchived = archivedFiles.some((f) => f.name === currentFile);
+    if (isArchived) setActiveTab("archived");
+  }, [currentFile, archivedFiles]);
 
-  const visibleFiles = resolvedTab === "latest" ? latestFiles : archivedFiles;
+  const visibleFiles = activeTab === "latest" ? latestFiles : archivedFiles;
 
   const showFilterOptions =
     filterOptions.siteCodes.length > 0 || filterOptions.siteNames.length > 0 || files.length > 0;
@@ -144,16 +146,16 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
           <button
             onClick={() => setActiveTab("latest")}
             className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition ${
-              resolvedTab === "latest"
+              activeTab === "latest"
                 ? "bg-slate-700 text-slate-100 shadow"
                 : "text-slate-400 hover:text-slate-300"
             }`}
           >
-            <Clock className={`h-3.5 w-3.5 ${resolvedTab === "latest" ? "text-emerald-400" : "text-slate-500"}`} />
+            <Clock className={`h-3.5 w-3.5 ${activeTab === "latest" ? "text-emerald-400" : "text-slate-500"}`} />
             Latest
             <span
               className={`rounded-full px-1.5 py-0.5 text-[10px] ${
-                resolvedTab === "latest"
+                activeTab === "latest"
                   ? "bg-emerald-400/15 text-emerald-400"
                   : "bg-slate-700 text-slate-500"
               }`}
@@ -165,16 +167,16 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
           <button
             onClick={() => setActiveTab("archived")}
             className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition ${
-              resolvedTab === "archived"
+              activeTab === "archived"
                 ? "bg-slate-700 text-slate-100 shadow"
                 : "text-slate-400 hover:text-slate-300"
             }`}
           >
-            <Archive className={`h-3.5 w-3.5 ${resolvedTab === "archived" ? "text-amber-400" : "text-slate-500"}`} />
+            <Archive className={`h-3.5 w-3.5 ${activeTab === "archived" ? "text-amber-400" : "text-slate-500"}`} />
             Archived
             <span
               className={`rounded-full px-1.5 py-0.5 text-[10px] ${
-                resolvedTab === "archived"
+                activeTab === "archived"
                   ? "bg-amber-400/15 text-amber-400"
                   : "bg-slate-700 text-slate-500"
               }`}
