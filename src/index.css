@@ -19,12 +19,6 @@
   background: #64748b;
 }
 
-/* Drag-and-drop highlight */
-.drop-zone-active {
-  border-color: #38bdf8 !important;
-  background-color: rgba(56, 189, 248, 0.05) !important;
-}
-
 /* Fade-in animation */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }

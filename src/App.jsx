@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
-import { Radar, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
+import elementLogo from "./assets/elementlogo.png";
 import LoginPage from "./components/LoginPage";
 import { parseNmapXml } from "./lib/nmapParser";
 import { useHostFilter } from "./hooks/useHostFilter";
@@ -83,9 +84,9 @@ export default function App() {
       <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950">
         <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-6 py-3">
           <div className="flex items-center gap-3">
-            <Radar className="h-6 w-6 text-sky-400" />
+            <img src={elementLogo} alt="Element logo" className="h-6 w-6" />
             <span className="text-lg font-bold tracking-tight">
-              ELEMENT<span className="text-sky-400">Monitor</span>
+              Element<span className="text-sky-400">Monitor</span>
             </span>
           </div>
 

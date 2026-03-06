@@ -25,7 +25,9 @@ A self-hosted web application for viewing, browsing, and analysing Nmap XML scan
    - [src/hooks/useHostFilter.js](#srchooksusehostfilterjs)
    - [src/components/LoginPage.jsx](#srccomponentsloginpagejsx)
    - [src/components/ScanPicker.jsx](#srccomponentsscanpickerjsx)
+   - [src/components/ActiveScans.jsx](#srccomponentsactivescansjsx)
    - [src/components/SummaryCards.jsx](#srccomponentssummarycardsjsx)
+   - [src/components/PortOverview.jsx](#srccomponentsportoverviewjsx)
    - [src/components/SearchBar.jsx](#srccomponentssearchbarjsx)
    - [src/components/HostTable.jsx](#srccomponentshosttablejsx)
    - [src/components/HostDetail.jsx](#srccomponentshostdetailjsx)
@@ -376,12 +378,13 @@ Mounts the `<App />` component into the `<div id="root">` in `index.html`. This 
 | `currentFile` | string \| null | Filename of the currently loaded scan. Passed to `ScanPicker` to highlight the active file |
 | `parseError` | string \| null | Error message shown below the sidebar if XML parsing fails |
 | `selectedHost` | object \| null | The host object currently open in the `HostDetail` slide-over panel |
+| `selectedPort` | number \| null | Port number selected in `PortOverview` — filters the host table to show only hosts with that port open |
 
 **Key logic:**
 - **Auth check on mount** — `useEffect` calls `GET /api/auth/check` once. Sets `authenticated = true` on 200, `false` on 401. This restores existing sessions without forcing the user to log in after a page refresh.
 - `handleLogout()` — POSTs to `/api/logout`, then resets `authenticated`, `scanResult`, `currentFile`, and `selectedHost` to their initial values.
 - `handleLoadXml(xmlString, filename)` — called by `ScanPicker` when the user clicks a file. Passes the raw XML through `parseNmapXml()` and stores the result. If parsing throws, stores the error message instead.
-- `useHostFilter(hosts)` — supplies `query`, `setQuery`, `sorted`, `sortKey`, `sortAsc`, `toggleSort` to the search bar and host table.
+- `useHostFilter(hosts, { portFilter })` — supplies `query`, `setQuery`, `sorted`, `sortKey`, `sortAsc`, `toggleSort` to the search bar and host table. The `portFilter` option filters hosts to those with the selected port open.
 
 **Render logic (conditional):**
 ```
@@ -389,11 +392,12 @@ authenticated === null  →  Full-screen loading spinner
 authenticated === false →  <LoginPage onLogin={() => setAuthenticated(true)} />
 authenticated === true  →  Full application layout:
   <App>
-    <header>          ← Sticky navbar (logo + scan args + Sign out button)
+    <header>          ← Sticky navbar (Element logo + app name + Sign out button)
     <main>
-      <sidebar>       ← ScanPicker (file browser + file filters)
+      <sidebar>       ← ScanPicker (file browser + file filters) + ActiveScans
       <content>
         <SummaryCards>   ← 4 stat cards (only shown when scan loaded)
+        <PortOverview>   ← Unique open ports bar chart (clickable to filter hosts)
         <SearchBar>      ← Free-text host search
         <HostTable>      ← Sortable table of all hosts
     <HostDetail>      ← Slide-over panel (only rendered when selectedHost is set)
@@ -415,7 +419,6 @@ authenticated === true  →  Full application layout:
 |---|---|
 | `.animate-fade-in` | Fades elements in from slightly below on mount. Used by summary cards |
 | `.animate-pulse-dot` | Infinite opacity pulse on the green status dot in the host table. `will-change: opacity` is set to offload this to the GPU and avoid CPU repaints |
-| `.drop-zone-active` | Previously used for drag-and-drop file upload (feature removed, class can be deleted) |
 | Custom scrollbar styles | `::-webkit-scrollbar` rules give the dark scrollbar appearance throughout the app |
 
 **Bugfixing notes:**
@@ -482,6 +485,9 @@ This is common well-known service ports. Add or remove entries here to change wh
 | `sortAsc` | boolean | True = ascending, false = descending |
 | `toggleSort(key)` | function | Click handler for table column headers |
 | `filters`, `setFilter`, `clearFilters`, `activeFilterCount` | — | Legacy filter state, currently unused by the UI (filters were moved into `ScanPicker`) |
+
+**Port filter:**
+When a port is selected in the `PortOverview` chart, `App.jsx` passes `{ portFilter: selectedPort }` as the second argument to `useHostFilter`. The hook filters hosts to only those with that port in the `open` state.
 
 **Search logic (`query`):**
 The free-text query matches against:
@@ -560,9 +566,10 @@ The free-text query matches against:
 | `filterDateTo` | string | ISO date string for "modified before" filter |
 
 **File classification:**
-- **Latest** — files modified within the last 60 minutes (`ONE_HOUR_MS = 60 * 60 * 1000`).
-- **Archived** — files modified more than 60 minutes ago.
-- If the currently loaded file is in the archived set, the component automatically switches to the Archived tab (`resolvedTab` logic).
+- **Latest** — files whose name ends with `#LATEST.xml`.
+- **Archived** — all other files (not ending with `#LATEST.xml` or `#IN_PROGRESS.xml`).
+- **In Progress** — files ending with `#IN_PROGRESS.xml` are excluded from ScanPicker and shown in the `ActiveScans` panel instead.
+- When a file is selected, the tab auto-switches to match the file's category. After that, clicking either tab works freely.
 
 **`parseFileMeta(name)` (local, not the parser's version):**
 Parses the filename convention locally to extract `siteCode` and `siteName` for populating the filter dropdowns. This is separate from the parser's `parseFilename()` — it's a lightweight version just for the UI.
@@ -575,9 +582,20 @@ Filters are applied client-side against the `files` array before the latest/arch
 2. `GET /api/scans/:filename` — when a file row is clicked.
 
 **Bugfixing notes:**
-- If files don't appear in the correct tab, check your system clock vs the file modification timestamps. The 1-hour threshold uses `Date.now()` vs `file.modified` (an ISO string from the server's `fs.statSync`).
+- If files don't appear in the correct tab, check whether the filename ends with `#LATEST.xml`. Files that don't follow the naming convention appear in the Archived tab.
 - If site code/name filters don't appear, the filenames don't follow the `SITECODE#SiteName#...` convention.
 - If clicking a file does nothing, check the browser network tab for the `GET /api/scans/:filename` request and its response.
+
+---
+
+### `src/components/ActiveScans.jsx`
+
+**Purpose:** Displays in-progress scans below the ScanPicker sidebar. Polls `/api/scans` every 10 seconds and shows files whose names end with `#IN_PROGRESS.xml`.
+
+**Behaviour:**
+- Always visible — shows an idle state ("No active scans") when nothing is in progress.
+- Parses `SITECODE#SiteName#IP` metadata from in-progress filenames.
+- Uses a pulsing amber indicator when scans are active.
 
 ---
 
@@ -599,6 +617,30 @@ The OS Distribution card is wider and only renders if OS data is present in the 
 **Bugfixing notes:**
 - The "Open Ports" count only includes ports in the hardcoded `CRITICAL_PORTS` set inside `nmapParser.js`. If you expect a higher number, add more ports to that set.
 - Cards use `animate-fade-in` on every render — if you see a flicker when switching between scan files, this is the fade-in animation re-triggering.
+
+---
+
+### `src/components/PortOverview.jsx`
+
+**Purpose:** Displays a horizontal bar chart of all unique open ports across every host in the loaded scan. Appears between the summary cards and the search/table section.
+
+**Props:**
+| Prop | Type | Description |
+|---|---|---|
+| `hosts` | array | Full (unfiltered) host array from the scan |
+| `selectedPort` | number \| null | Currently selected port number (highlighted in chart) |
+| `onSelectPort` | `(portId \| null) => void` | Called when a port bar is clicked or the filter is cleared |
+
+**Behaviour:**
+- Aggregates all open ports across all hosts, counting how many hosts have each port open.
+- Sorts ports by frequency (most common first).
+- Each bar is clickable — clicking a port filters the host table to only show hosts with that port open.
+- Clicking the same port again (or the "Clear filter" button) removes the filter.
+- The bar chart scrolls vertically if there are many unique ports (max height ~16rem).
+
+**Bugfixing notes:**
+- If the chart is empty, no hosts have any ports in the `open` state. Check the XML scan data.
+- The port filter is passed from `App.jsx` through `useHostFilter` — if clicking a port doesn't filter the table, check that `selectedPort` state and `portFilter` are wired correctly.
 
 ---
 
@@ -713,16 +755,19 @@ Shows the host IP, first hostname, MAC address, and MAC vendor (from ARP data if
     e. Returns scanResult object
 14. App.jsx stores scanResult in state → React re-renders
 15. SummaryCards reads scanResult.summary → renders stat cards
-16. HostTable receives all hosts → renders rows
+16. PortOverview aggregates open ports across all hosts → renders bar chart
+17. HostTable receives all hosts → renders rows
     - Site banner shows scanResult.fileSiteName / fileSiteCode
-17. User types in SearchBar → useHostFilter runs client-side
+18. User clicks a port bar in PortOverview → selectedPort set in App.jsx
+    - useHostFilter filters hosts to those with that port open → table updates
+19. User types in SearchBar → useHostFilter runs client-side
     - Filters hosts array → HostTable re-renders
-18. User clicks a column header → useHostFilter re-sorts
+20. User clicks a column header → useHostFilter re-sorts
     - HostTable re-renders in new order
-19. User clicks a port count button → selectedHost set in App.jsx
+21. User clicks a port count button → selectedHost set in App.jsx
     - HostDetail panel slides in showing ports, scripts, OS
-20. User closes panel → selectedHost set to null → panel unmounts
-21. User clicks Sign out → App.jsx POSTs to /api/logout
+22. User closes panel → selectedHost set to null → panel unmounts
+23. User clicks Sign out → App.jsx POSTs to /api/logout
     → session deleted server-side → cookie cleared
     → authenticated = false → LoginPage rendered
 ```
