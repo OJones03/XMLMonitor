@@ -12,7 +12,7 @@ import { useMemo, useState } from "react";
  *  dateFrom – ISO date string (inclusive lower bound on scanTime)
  *  dateTo   – ISO date string (inclusive upper bound on scanTime)
  */
-export function useHostFilter(hosts) {
+export function useHostFilter(hosts, { portFilter = null } = {}) {
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState({
     subnet: "",
@@ -74,8 +74,15 @@ export function useHostFilter(hosts) {
       list = list.filter((h) => h.scanTime && new Date(h.scanTime).getTime() <= to);
     }
 
+    // Port filter (from PortOverview click)
+    if (portFilter != null) {
+      list = list.filter((h) =>
+        h.ports.some((p) => p.portId === portFilter && p.state === "open")
+      );
+    }
+
     return list;
-  }, [hosts, query, filters]);
+  }, [hosts, query, filters, portFilter]);
 
   const sorted = useMemo(() => {
     const list = [...filtered];

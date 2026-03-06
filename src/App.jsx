@@ -11,6 +11,7 @@ import SearchBar from "./components/SearchBar";
 
 import HostTable from "./components/HostTable";
 import HostDetail from "./components/HostDetail";
+import PortOverview from "./components/PortOverview";
 
 /**
  * Root application layout.
@@ -24,6 +25,7 @@ export default function App() {
   const [currentFile, setCurrentFile] = useState(null);
   const [parseError, setParseError] = useState(null);
   const [selectedHost, setSelectedHost] = useState(null);
+  const [selectedPort, setSelectedPort] = useState(null);
 
   // On first mount, ask the server whether the session cookie is valid
   useEffect(() => {
@@ -44,7 +46,7 @@ export default function App() {
   const {
     query, setQuery,
     sorted, sortKey, sortAsc, toggleSort,
-  } = useHostFilter(hosts);
+  } = useHostFilter(hosts, { portFilter: selectedPort });
 
   const handleLoadXml = useCallback((xmlString, filename) => {
     try {
@@ -53,6 +55,7 @@ export default function App() {
       setScanResult(result);
       setCurrentFile(filename);
       setSelectedHost(null);
+      setSelectedPort(null);
     } catch (err) {
       setParseError(err.message);
       setScanResult(null);
@@ -137,6 +140,15 @@ export default function App() {
             {/* Widget: Summary Cards */}
             <section>
               <SummaryCards summary={scanResult.summary} />
+            </section>
+
+            {/* Widget: Port Overview */}
+            <section>
+              <PortOverview
+                hosts={hosts}
+                selectedPort={selectedPort}
+                onSelectPort={setSelectedPort}
+              />
             </section>
 
             {/* Widget: Search + Filters + Table */}
