@@ -141,7 +141,7 @@ export default function App() {
 
             {/* Widget: Search + Filters + Table */}
             <section className="space-y-4">
-              <SearchBar value={query} onChange={setQuery} hosts={hosts} />
+              <SearchBar value={query} onChange={setQuery} />
               <HostTable
                 hosts={sorted}
                 sortKey={sortKey}
