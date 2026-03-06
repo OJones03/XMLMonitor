@@ -343,7 +343,7 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
                 <p className="text-sm text-slate-500">No files match the current filters.</p>
                 <button onClick={clearFilters} className="text-xs text-sky-400 hover:underline">Clear filters</button>
               </>
-            ) : resolvedTab === "latest" ? (
+            ) : activeTab === "latest" ? (
               <>
                 <Clock className="h-6 w-6 text-slate-700" />
                 <p className="text-sm text-slate-500">No latest scans.</p>
@@ -366,7 +366,7 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
             isActive={file.name === currentFile}
             isFetching={file.name === fetchingFile}
             onSelect={selectFile}
-            muted={resolvedTab === "archived"}
+            muted={activeTab === "archived"}
           />
         ))}
       </div>
