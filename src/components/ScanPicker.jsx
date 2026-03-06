@@ -126,11 +126,12 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
   const latestFiles   = pickableFiles.filter((f) => f.name.endsWith("#LATEST.xml"));
   const archivedFiles = pickableFiles.filter((f) => !f.name.endsWith("#LATEST.xml"));
 
-  // If the active file is in the archive, auto-switch to the archived tab
+  // When a new file is selected, auto-switch tab to match its category
   useEffect(() => {
-    const isArchived = archivedFiles.some((f) => f.name === currentFile);
-    if (isArchived) setActiveTab("archived");
-  }, [currentFile, archivedFiles]);
+    if (!currentFile) return;
+    const isLatest = currentFile.endsWith("#LATEST.xml");
+    setActiveTab(isLatest ? "latest" : "archived");
+  }, [currentFile]);
 
   const visibleFiles = activeTab === "latest" ? latestFiles : archivedFiles;
 
