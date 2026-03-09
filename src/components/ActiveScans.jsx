@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
-import { RefreshCw, Server, CheckCircle } from "lucide-react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { RefreshCw, Server, CheckCircle, Timer } from "lucide-react";
 
 const POLL_INTERVAL_MS = 10_000; // refresh every 10 seconds
 
@@ -26,6 +26,13 @@ function parseInProgressMeta(name) {
 export default function ActiveScans() {
   const [activeScans, setActiveScans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [, setTick] = useState(0);
+
+  // Tick every second so elapsed timers update live
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const fetchScans = useCallback(async () => {
     try {
@@ -111,6 +118,12 @@ export default function ActiveScans() {
                       </span>
                     )}
                   </div>
+                  {file.modified && (
+                    <div className="flex items-center gap-1 mt-1 text-[11px] text-amber-400/70">
+                      <Timer className="h-2.5 w-2.5" />
+                      <span className="font-mono">{formatElapsed(file.modified)}</span>
+                    </div>
+                  )}
                 </div>
                 <RefreshCw className="h-3.5 w-3.5 shrink-0 animate-spin text-amber-500/60" />
               </li>
@@ -120,4 +133,16 @@ export default function ActiveScans() {
       )}
     </div>
   );
+}
+
+/* ── Helpers ────────────────────────────────────────────────── */
+
+function formatElapsed(iso) {
+  const diffMs = Math.max(0, Date.now() - new Date(iso).getTime());
+  const totalSec = Math.floor(diffMs / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  const pad = (n) => String(n).padStart(2, "0");
+  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }

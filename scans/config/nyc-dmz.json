@@ -1,14 +1,6 @@
 {
-  "SiteCode": "NYC",
-  "SiteName": "Corp_DMZ",
-  "CIDR": "203.0.113.0/28",
-  "Profile": "Quick SYN + Top 1000",
-  "schedule": {
-    "frequency": "daily",
-    "time": "04:30"
-  },
-  "lastRun": "2026-03-09T04:30:00Z",
-  "nextRun": "2026-03-10T04:30:00Z",
-  "enabled": true,
-  "nmapArgs": "-sS -sV --top-ports 1000 -T4"
+  "SiteCode": "DMZ",
+  "CronEntry": "30 4 * * *",
+  "Interval": "daily",
+  "RetentionDays": 30
 }

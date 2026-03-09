@@ -1,15 +1,6 @@
 {
   "SiteCode": "LDN",
-  "SiteName": "London_Office",
-  "CIDR": "172.16.0.0/24",
-  "Profile": "Standard TCP + Service Detection",
-  "schedule": {
-    "frequency": "weekly",
-    "day": "wednesday",
-    "time": "23:00"
-  },
-  "lastRun": "2026-03-05T23:00:00Z",
-  "nextRun": "2026-03-12T23:00:00Z",
-  "enabled": true,
-  "nmapArgs": "-sV -sC -T3"
+  "CronEntry": "0 23 * * 3",
+  "Interval": "weekly",
+  "RetentionDays": 60
 }
