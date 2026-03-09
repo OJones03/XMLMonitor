@@ -1,9 +1,8 @@
 {
-  "name": "London Office Network",
-  "siteCode": "LDN",
-  "siteName": "London_Office",
-  "target": "172.16.0.0/24",
-  "profile": "Standard TCP + Service Detection",
+  "SiteCode": "LDN",
+  "SiteName": "London_Office",
+  "CIDR": "172.16.0.0/24",
+  "Profile": "Standard TCP + Service Detection",
   "schedule": {
     "frequency": "weekly",
     "day": "wednesday",

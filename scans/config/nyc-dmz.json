@@ -1,9 +1,8 @@
 {
-  "name": "DMZ Perimeter Scan",
-  "siteCode": "NYC",
-  "siteName": "Corp_DMZ",
-  "target": "203.0.113.0/28",
-  "profile": "Quick SYN + Top 1000",
+  "SiteCode": "NYC",
+  "SiteName": "Corp_DMZ",
+  "CIDR": "203.0.113.0/28",
+  "Profile": "Quick SYN + Top 1000",
   "schedule": {
     "frequency": "daily",
     "time": "04:30"

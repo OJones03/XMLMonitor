@@ -33,7 +33,7 @@ export default function ScheduledScans() {
     return () => clearInterval(id);
   }, [fetchSchedules]);
 
-  const enabledCount = schedules.filter((s) => s.enabled).length;
+  const enabledCount = schedules.filter((s) => getField(s, "enabled", true)).length;
   const hasSchedules = schedules.length > 0;
 
   // Show first 3 by default, all when expanded
@@ -87,24 +87,43 @@ export default function ScheduledScans() {
   );
 }
 
+/* ── Field access helper (supports both PascalCase and camelCase configs) ── */
+
+function getField(obj, key, fallback = "") {
+  // Try camelCase first, then PascalCase, then UPPER
+  const pascal = key.charAt(0).toUpperCase() + key.slice(1);
+  const upper = key.toUpperCase();
+  return obj[key] ?? obj[pascal] ?? obj[upper] ?? fallback;
+}
+
 /* ── Sub-component ──────────────────────────────────────────── */
 
 function ScheduleRow({ schedule: s }) {
-  const isOverdue = s.enabled && s.nextRun && new Date(s.nextRun) < new Date();
+  const enabled  = getField(s, "enabled", true); // default to true if field missing
+  const name     = getField(s, "name") || getField(s, "siteName", "").replace(/_/g, " ") || s._file;
+  const siteCode = getField(s, "siteCode");
+  const siteName = getField(s, "siteName");
+  const target   = getField(s, "CIDR") || getField(s, "target") || getField(s, "cidr");
+  const schedule = getField(s, "schedule", null);
+  const nextRun  = getField(s, "nextRun");
+  const cron     = getField(s, "cron") || getField(s, "Cron");
+  const frequency = getField(s, "frequency") || getField(s, "Frequency");
+
+  const isOverdue = enabled && nextRun && new Date(nextRun) < new Date();
 
   return (
     <li className="px-4 py-3 space-y-1.5">
       {/* Row 1: Name + enabled/disabled badge */}
       <div className="flex items-center gap-2">
-        {s.enabled ? (
+        {enabled ? (
           <Play className="h-3 w-3 shrink-0 text-emerald-400" />
         ) : (
           <Pause className="h-3 w-3 shrink-0 text-slate-600" />
         )}
-        <span className={`truncate text-sm font-medium ${s.enabled ? "text-slate-200" : "text-slate-500"}`}>
-          {s.name}
+        <span className={`truncate text-sm font-medium ${enabled ? "text-slate-200" : "text-slate-500"}`}>
+          {name}
         </span>
-        {!s.enabled && (
+        {!enabled && (
           <span className="ml-auto shrink-0 rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-500">
             Disabled
           </span>
@@ -113,32 +132,44 @@ function ScheduleRow({ schedule: s }) {
 
       {/* Row 2: Metadata chips */}
       <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
-        {s.siteCode && (
+        {siteCode && (
           <span className="flex items-center gap-1 text-slate-500">
             <Tag className="h-2.5 w-2.5 text-amber-400" />
-            <span className="text-slate-400">{s.siteCode}</span>
+            <span className="text-slate-400">{siteCode}</span>
           </span>
         )}
-        {s.target && (
+        {siteName && (
+          <span className="flex items-center gap-1 text-slate-500">
+            <MapPin className="h-2.5 w-2.5 text-violet-400" />
+            <span className="text-slate-400">{siteName.replace(/_/g, " ")}</span>
+          </span>
+        )}
+        {target && (
           <span className="flex items-center gap-1 text-slate-500">
             <Crosshair className="h-2.5 w-2.5 text-sky-400" />
-            <span className="font-mono text-slate-400">{s.target}</span>
+            <span className="font-mono text-slate-400">{target}</span>
           </span>
         )}
       </div>
 
-      {/* Row 3: Frequency + next run */}
+      {/* Row 3: Schedule info */}
       <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
-        {s.schedule && (
+        {schedule && typeof schedule === "object" && (
           <span className="flex items-center gap-1 text-slate-500">
             <Clock className="h-2.5 w-2.5" />
-            {formatFrequency(s.schedule)}
+            {formatFrequency(schedule)}
           </span>
         )}
-        {s.nextRun && s.enabled && (
+        {!schedule && (frequency || cron) && (
+          <span className="flex items-center gap-1 text-slate-500">
+            <Clock className="h-2.5 w-2.5" />
+            {frequency || cron}
+          </span>
+        )}
+        {nextRun && enabled && (
           <span className={`flex items-center gap-1 ${isOverdue ? "text-amber-400" : "text-slate-500"}`}>
             <Calendar className="h-2.5 w-2.5" />
-            Next: <span className={isOverdue ? "font-semibold" : "text-slate-400"}>{formatRelative(s.nextRun)}</span>
+            Next: <span className={isOverdue ? "font-semibold" : "text-slate-400"}>{formatRelative(nextRun)}</span>
           </span>
         )}
       </div>

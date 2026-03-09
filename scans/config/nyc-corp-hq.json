@@ -1,9 +1,8 @@
 {
-  "name": "Corp HQ Full Scan",
-  "siteCode": "NYC",
-  "siteName": "Corp_HQ",
-  "target": "10.0.1.0/24",
-  "profile": "Full TCP + OS + Scripts",
+  "SiteCode": "NYC",
+  "SiteName": "Corp_HQ",
+  "CIDR": "10.0.1.0/24",
+  "Profile": "Full TCP + OS + Scripts",
   "schedule": {
     "frequency": "weekly",
     "day": "sunday",
