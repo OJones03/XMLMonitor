@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { Calendar, Clock, Tag, Crosshair, RefreshCw, Archive, Repeat } from "lucide-react";
+import { Calendar, Clock, Tag, Crosshair, RefreshCw, Archive, Repeat, MapPin } from "lucide-react";
 
 const POLL_INTERVAL_MS = 30_000; // refresh every 30 s
 
@@ -90,7 +90,8 @@ export default function ScheduledScans() {
 
 function ScheduleRow({ schedule: s }) {
   const siteCode      = s.SiteCode ?? "";
-  const cronEntry     = s.CronEntry ?? "";
+  const siteName      = s.SiteName ?? "";
+  const cidr          = s.CIDR ?? "";
   const interval      = s.Interval ?? "";
   const retentionDays = s.RetentionDays;
 
@@ -104,14 +105,24 @@ function ScheduleRow({ schedule: s }) {
         </span>
       </div>
 
-      {/* Row 2: Cron + Interval */}
+      {/* Row 2: Site name + CIDR */}
       <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
-        {cronEntry && (
+        {siteName && (
           <span className="flex items-center gap-1 text-slate-500">
-            <Clock className="h-2.5 w-2.5 text-sky-400" />
-            <span className="font-mono text-slate-400">{cronEntry}</span>
+            <MapPin className="h-2.5 w-2.5 text-violet-400" />
+            <span className="text-slate-400">{siteName.replace(/_/g, " ")}</span>
           </span>
         )}
+        {cidr && (
+          <span className="flex items-center gap-1 text-slate-500">
+            <Crosshair className="h-2.5 w-2.5 text-sky-400" />
+            <span className="font-mono text-slate-400">{cidr}</span>
+          </span>
+        )}
+      </div>
+
+      {/* Row 3: Interval */}
+      <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
         {interval && (
           <span className="flex items-center gap-1 text-slate-500">
             <Repeat className="h-2.5 w-2.5 text-violet-400" />

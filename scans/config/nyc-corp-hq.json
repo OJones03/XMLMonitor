@@ -1,6 +1,7 @@
 {
   "SiteCode": "NYC",
-  "CronEntry": "0 2 * * 0",
+  "SiteName": "Corp_HQ",
+  "CIDR": "10.0.1.0/24",
   "Interval": "weekly",
   "RetentionDays": 90
 }

@@ -1,6 +1,7 @@
 {
   "SiteCode": "DEV",
-  "CronEntry": "0 1 1 * *",
+  "SiteName": "Dev_Lab",
+  "CIDR": "10.10.0.0/24",
   "Interval": "monthly",
   "RetentionDays": 180
 }

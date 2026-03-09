@@ -1,6 +1,7 @@
 {
   "SiteCode": "DMZ",
-  "CronEntry": "30 4 * * *",
+  "SiteName": "Corp_DMZ",
+  "CIDR": "203.0.113.0/28",
   "Interval": "daily",
   "RetentionDays": 30
 }
