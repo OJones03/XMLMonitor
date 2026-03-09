@@ -13,6 +13,7 @@ import SearchBar from "./components/SearchBar";
 import HostTable from "./components/HostTable";
 import HostDetail from "./components/HostDetail";
 import PortOverview from "./components/PortOverview";
+import SettingsMenu from "./components/SettingsMenu";
 
 /**
  * Root application layout.
@@ -91,6 +92,7 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-3 text-xs text-slate-500">
+            <SettingsMenu />
             <button
               onClick={handleLogout}
               title="Sign out"

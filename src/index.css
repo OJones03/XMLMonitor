@@ -1,6 +1,37 @@
 @import "tailwindcss";
 
-/* Custom dark mode scrollbar */
+/* ═══════════════════════════════════════════════════════════
+   Light-theme overrides
+   Invert Tailwind's slate palette so every existing
+   bg-slate-* / text-slate-* / border-slate-* class
+   automatically maps to light-mode equivalents.
+   ═══════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+  --color-slate-950: oklch(0.984 0.003 247.858); /* ← original 50  */
+  --color-slate-900: oklch(0.968 0.007 247.896); /* ← original 100 */
+  --color-slate-800: oklch(0.929 0.013 255.508); /* ← original 200 */
+  --color-slate-700: oklch(0.869 0.022 252.894); /* ← original 300 */
+  --color-slate-600: oklch(0.704 0.04  256.788); /* ← original 400 */
+  --color-slate-500: oklch(0.554 0.046 257.417); /* unchanged       */
+  --color-slate-400: oklch(0.446 0.043 257.281); /* ← original 600 */
+  --color-slate-300: oklch(0.372 0.044 257.287); /* ← original 700 */
+  --color-slate-200: oklch(0.279 0.041 260.031); /* ← original 800 */
+  --color-slate-100: oklch(0.208 0.042 265.755); /* ← original 900 */
+  --color-slate-50:  oklch(0.129 0.042 264.695); /* ← original 950 */
+  color-scheme: light;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Compact table density
+   ═══════════════════════════════════════════════════════════ */
+[data-compact="true"] table td {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Scrollbar – adapts to theme
+   ═══════════════════════════════════════════════════════════ */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -16,6 +47,18 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
   background: #64748b;
 }
 
