@@ -1,0 +1,16 @@
+{
+  "name": "Dev Lab Vulnerability Check",
+  "siteCode": "NYC",
+  "siteName": "Dev_Lab",
+  "target": "10.10.0.0/24",
+  "profile": "Full TCP + UDP + Vuln Scripts",
+  "schedule": {
+    "frequency": "monthly",
+    "dayOfMonth": 1,
+    "time": "01:00"
+  },
+  "lastRun": "2026-03-01T01:00:00Z",
+  "nextRun": "2026-04-01T01:00:00Z",
+  "enabled": false,
+  "nmapArgs": "-sV -sU -sS -O --script vuln -T3"
+}

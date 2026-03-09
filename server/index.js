@@ -212,6 +212,34 @@ app.get("/api/scans/:filename", requireAuth, (req, res) => {
   }
 });
 
+/* ── Protected: list scheduled scan configs ───────────────── */
+const CONFIG_DIR = path.join(SCANS_DIR, "config");
+
+app.get("/api/schedules", requireAuth, (_req, res) => {
+  if (!fs.existsSync(CONFIG_DIR)) {
+    return res.json({ schedules: [] });
+  }
+
+  try {
+    const files = fs.readdirSync(CONFIG_DIR).filter((f) => f.endsWith(".json"));
+    const schedules = files
+      .map((name) => {
+        try {
+          const raw = fs.readFileSync(path.join(CONFIG_DIR, name), "utf-8");
+          return { ...JSON.parse(raw), _file: name };
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean)
+      .sort((a, b) => new Date(a.nextRun || 0) - new Date(b.nextRun || 0));
+
+    res.json({ schedules });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 /* ── SPA static file serving ──────────────────────────────── */
 if (fs.existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR));

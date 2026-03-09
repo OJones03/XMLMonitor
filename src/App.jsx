@@ -15,6 +15,7 @@ import HostDetail from "./components/HostDetail";
 import PortOverview from "./components/PortOverview";
 import SettingsMenu from "./components/SettingsMenu";
 import DashboardView from "./components/DashboardView";
+import ScheduledScans from "./components/ScheduledScans";
 import { useTheme } from "./contexts/ThemeContext";
 
 /**
@@ -117,6 +118,7 @@ export default function App() {
           <div className="w-full lg:w-96 lg:shrink-0">
             <ScanPicker onLoadXml={handleLoadXml} currentFile={currentFile} />
             <ActiveScans />
+            <ScheduledScans />
             {parseError && (
               <p className="mt-3 rounded-lg border border-red-900 bg-red-950/40 px-4 py-3 text-sm text-red-400">
                 {parseError}
