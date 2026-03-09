@@ -14,12 +14,16 @@ import HostTable from "./components/HostTable";
 import HostDetail from "./components/HostDetail";
 import PortOverview from "./components/PortOverview";
 import SettingsMenu from "./components/SettingsMenu";
+import DashboardView from "./components/DashboardView";
+import { useTheme } from "./contexts/ThemeContext";
 
 /**
  * Root application layout.
  * Uses a grid-based widget system so cards can be reordered / added easily.
  */
 export default function App() {
+  const { compact } = useTheme();
+
   // null = still checking, false = not logged in, true = logged in
   const [authenticated, setAuthenticated] = useState(null);
 
@@ -140,33 +144,45 @@ export default function App() {
               </p>
             </div>
 
-            {/* Widget: Summary Cards */}
-            <section>
-              <SummaryCards summary={scanResult.summary} />
-            </section>
-
-            {/* Widget: Port Overview */}
-            <section>
-              <PortOverview
+            {compact ? (
+              /* ── At a Glance dashboard ─────────── */
+              <DashboardView
+                scanResult={scanResult}
                 hosts={hosts}
-                selectedPort={selectedPort}
-                onSelectPort={setSelectedPort}
+                onSelectHost={setSelectedHost}
               />
-            </section>
+            ) : (
+              /* ── Full detail view ─────────────── */
+              <>
+                {/* Widget: Summary Cards */}
+                <section>
+                  <SummaryCards summary={scanResult.summary} />
+                </section>
 
-            {/* Widget: Search + Filters + Table */}
-            <section className="space-y-4">
-              <SearchBar value={query} onChange={setQuery} />
-              <HostTable
-                hosts={sorted}
-                sortKey={sortKey}
-                sortAsc={sortAsc}
-                toggleSort={toggleSort}
-                onSelect={setSelectedHost}
-                siteName={scanResult.fileSiteName}
-                siteCode={scanResult.fileSiteCode}
-              />
-            </section>
+                {/* Widget: Port Overview */}
+                <section>
+                  <PortOverview
+                    hosts={hosts}
+                    selectedPort={selectedPort}
+                    onSelectPort={setSelectedPort}
+                  />
+                </section>
+
+                {/* Widget: Search + Filters + Table */}
+                <section className="space-y-4">
+                  <SearchBar value={query} onChange={setQuery} />
+                  <HostTable
+                    hosts={sorted}
+                    sortKey={sortKey}
+                    sortAsc={sortAsc}
+                    toggleSort={toggleSort}
+                    onSelect={setSelectedHost}
+                    siteName={scanResult.fileSiteName}
+                    siteCode={scanResult.fileSiteCode}
+                  />
+                </section>
+              </>
+            )}
           </>
         )}
           </div>

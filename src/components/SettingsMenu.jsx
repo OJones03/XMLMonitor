@@ -1,5 +1,5 @@
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import { Settings, Sun, Moon, Monitor, Rows3, Rows4 } from "lucide-react";
+import { Settings, Sun, Moon, Monitor, Rows3, LayoutDashboard } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
 
 const themeOptions = [
@@ -45,10 +45,10 @@ export default function SettingsMenu() {
           </div>
         </div>
 
-        {/* ── Table Density ────────────────────── */}
+        {/* ── View Mode ────────────────────────── */}
         <div>
           <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Table Density
+            View Mode
           </h3>
           <div className="flex gap-1 rounded-lg bg-slate-800/60 p-1">
             <button
@@ -60,7 +60,7 @@ export default function SettingsMenu() {
               }`}
             >
               <Rows3 className="h-3.5 w-3.5" />
-              Comfortable
+              Full Detail
             </button>
             <button
               onClick={() => updateSetting("compact", true)}
@@ -70,8 +70,8 @@ export default function SettingsMenu() {
                   : "text-slate-400 hover:text-slate-300"
               }`}
             >
-              <Rows4 className="h-3.5 w-3.5" />
-              Compact
+              <LayoutDashboard className="h-3.5 w-3.5" />
+              At a Glance
             </button>
           </div>
         </div>
