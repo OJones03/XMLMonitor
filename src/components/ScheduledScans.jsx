@@ -101,16 +101,16 @@ function ScheduleRow({ schedule: s }) {
       <div className="flex items-center gap-2">
         <Tag className="h-3 w-3 shrink-0 text-amber-400" />
         <span className="truncate text-sm font-medium text-slate-200">
-          {siteCode || s._file}
+          {siteName || s._file}
         </span>
       </div>
 
       {/* Row 2: Site name + CIDR */}
       <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
-        {siteName && (
+        {siteCode && (
           <span className="flex items-center gap-1 text-slate-500">
             <MapPin className="h-2.5 w-2.5 text-violet-400" />
-            <span className="text-slate-400">{siteName.replace(/_/g, " ")}</span>
+            <span className="text-slate-400">{siteCode.replace(/_/g, " ")}</span>
           </span>
         )}
         {cidr && (
@@ -126,7 +126,7 @@ function ScheduleRow({ schedule: s }) {
         {interval && (
           <span className="flex items-center gap-1 text-slate-500">
             <Repeat className="h-2.5 w-2.5 text-violet-400" />
-            <span className="text-slate-400">{interval}</span>
+            <span className="text-slate-400">{formatInterval(interval)}</span>
           </span>
         )}
       </div>
@@ -140,4 +140,16 @@ function ScheduleRow({ schedule: s }) {
       )}
     </li>
   );
+}
+
+/* ── Helpers ────────────────────────────────────────────────── */
+
+function formatInterval(val) {
+  const mins = Number(val);
+  if (isNaN(mins)) return String(val);
+  if (mins < 60) return `${mins} min${mins !== 1 ? "s" : ""}`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (m === 0) return `${h} hr${h !== 1 ? "s" : ""}`;
+  return `${h} hr${h !== 1 ? "s" : ""} ${m} min${m !== 1 ? "s" : ""}`;
 }
