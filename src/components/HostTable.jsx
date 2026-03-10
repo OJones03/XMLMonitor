@@ -1,7 +1,7 @@
 import { ChevronUp, ChevronDown, MapPin, Tag, Download } from "lucide-react";
 
 function downloadCsv(hosts, siteName, siteCode) {
-  const headers = ["Site Code", "Site Name", "Status", "IP Address", "Subnet", "Hostname", "Timestamp", "Open Ports"];
+  const headers = ["Site Code", "Site Name", "Status", "IP Address", "Hostname", "Timestamp", "Open Ports"];
 
   const escape = (v) => {
     const s = String(v ?? "");
@@ -15,7 +15,6 @@ function downloadCsv(hosts, siteName, siteCode) {
     siteName ? siteName.replace(/_/g, " ") : "",
     h.status,
     h.ip,
-    h.subnet ?? "",
     h.hostnames[0] ?? "",
     h.scanTime ? new Date(h.scanTime).toLocaleString() : "",
     h.ports.filter((p) => p.state === "open").length,
@@ -44,7 +43,6 @@ export default function HostTable({ hosts, sortKey, sortAsc, toggleSort, onSelec
   const columns = [
     { key: "status",   label: "Status",    width: "w-24" },
     { key: "ip",       label: "IP Address", width: "" },
-    { key: "subnet",   label: "Subnet",     width: "w-36" },
     { key: "hostname", label: "Hostname",   width: "" },
     { key: "scanTime", label: "Timestamp",  width: "w-36" },
     { key: "ports",    label: "Open Ports", width: "w-28" },
@@ -75,6 +73,12 @@ export default function HostTable({ hosts, sortKey, sortAsc, toggleSort, onSelec
               <Tag className="h-3.5 w-3.5 text-amber-400" />
               <span className="font-medium text-slate-400">Code:</span>
               <span className="rounded-full bg-amber-400/10 px-2 py-0.5 font-semibold">{siteCode}</span>
+            </span>
+          )}
+          {hosts[0]?.subnet && (
+            <span className="flex items-center gap-1.5 text-xs text-cyan-300">
+              <span className="font-medium text-slate-400">Subnet:</span>
+              <span className="rounded-full bg-cyan-400/10 px-2 py-0.5 font-mono text-cyan-400">{hosts[0].subnet}</span>
             </span>
           )}
           <button
@@ -132,11 +136,6 @@ export default function HostTable({ hosts, sortKey, sortAsc, toggleSort, onSelec
 
                 {/* IP */}
                 <td className="px-5 py-3 font-mono text-slate-200">{host.ip}</td>
-
-                {/* Subnet */}
-                <td className="px-5 py-3 font-mono text-slate-400 text-xs">
-                  {host.subnet || "—"}
-                </td>
 
                 {/* Hostname */}
                 <td className="px-5 py-3 text-slate-400">
