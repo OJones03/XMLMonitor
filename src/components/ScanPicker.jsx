@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { Clock, Archive, RefreshCw, FileText, AlertCircle, ChevronRight, SlidersHorizontal, X } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 /**
  * Parse structured metadata encoded in the filename.
@@ -28,6 +29,7 @@ function parseFileMeta(name) {
  *  currentFile – filename currently loaded (for highlight)
  */
 export default function ScanPicker({ onLoadXml, currentFile }) {
+  const { apiFetch } = useAuth();
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -44,7 +46,7 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/scans");
+      const res = await apiFetch("/api/scans");
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setFiles(data.files ?? []);
@@ -53,7 +55,7 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [apiFetch]);
 
   useEffect(() => {
     loadFileList();
@@ -63,7 +65,7 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
     async (filename) => {
       setFetchingFile(filename);
       try {
-        const res = await fetch(`/api/scans/${encodeURIComponent(filename)}`);
+        const res = await apiFetch(`/api/scans/${encodeURIComponent(filename)}`);
         if (!res.ok) throw new Error(`Server returned ${res.status}`);
         const xml = await res.text();
         onLoadXml(xml, filename);
@@ -73,7 +75,7 @@ export default function ScanPicker({ onLoadXml, currentFile }) {
         setFetchingFile(null);
       }
     },
-    [onLoadXml]
+    [apiFetch, onLoadXml]
   );
 
   // Derive unique filter options from all files

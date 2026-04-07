@@ -3,31 +3,60 @@
  * ───────────────
  * Lightweight Express server that:
  *  1. Serves the built React app from ./dist
- *  2. Exposes /api/scans        – list all .xml files in SCANS_DIR
- *  3. Exposes /api/scans/:file  – return raw XML content of a specific file
- *  4. Exposes /api/login        – placeholder (no-op, always succeeds)
- *  5. Exposes /api/logout       – placeholder (no-op)
- *  6. Exposes /api/auth/check   – always returns authenticated: true
- *  7. Exposes /api/health       – liveness probe (for Docker healthcheck)
+ *  2. Exposes /api/scans        – list all .xml files in SCANS_DIR (protected)
+ *  3. Exposes /api/scans/:file  – return raw XML content of a file (protected)
+ *  4. Exposes /api/login        – validates credentials, returns a signed JWT
+ *  5. Exposes /api/logout       – client-side only; server-side is a no-op
+ *  6. Exposes /api/auth/check   – verifies a JWT, returns { authenticated: true }
+ *  7. Exposes /api/health       – liveness probe (no auth required)
+ *  8. Exposes /api/schedules    – list scheduled scan configs (protected)
  *
  * Environment variables:
- *  PORT      – HTTP port to listen on  (default: 3001)
- *  SCANS_DIR – Absolute path to XML files (default: /scans)
- *
- * Authentication is disabled. The /api/login, /api/logout, and
- * /api/auth/check endpoints are kept as placeholders.
+ *  PORT       – HTTP port to listen on  (default: 3001)
+ *  SCANS_DIR  – Absolute path to XML files (default: /scans)
+ *  JWT_SECRET – Secret used to sign/verify JWTs (required — server exits on startup if missing)
+ *  AUTH_USER  – Login username (default: admin)
+ *  AUTH_PASS  – Login password (default: changeme)
  */
 
+import "dotenv/config";
 import express from "express";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import jwt from "jsonwebtoken";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const PORT      = parseInt(process.env.PORT ?? "3001", 10);
 const SCANS_DIR = process.env.SCANS_DIR ?? "/scans";
 const DIST_DIR  = path.join(__dirname, "..", "dist");
+
+// ── JWT configuration ─────────────────────────────────────────────────────────
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_EXPIRY = "8h";
+
+if (!JWT_SECRET) {
+  console.error("ERROR: Missing JWT_SECRET environment variable. Set it in .env or the container environment.");
+  process.exit(1);
+}
+
+// ── Credentials (read from environment; backward-compatible with docker-compose) ─
+const AUTH_USER = process.env.AUTH_USER ?? "admin";
+const AUTH_PASS = process.env.AUTH_PASS ?? "admin";
+
+// ── Auth middleware ───────────────────────────────────────────────────────────
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!token) return res.status(401).json({ error: "Missing token" });
+  try {
+    req.user = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch {
+    return res.status(403).json({ error: "Invalid or expired token" });
+  }
+}
 
 const app = express();
 app.use(express.json());
@@ -37,17 +66,24 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
 });
 
-/* ── Placeholder: login (authentication disabled) ────────── */
-app.post("/api/login", (_req, res) => {
-  res.json({ ok: true });
+/* ── Public: login — validates credentials and returns a JWT ─ */
+app.post("/api/login", (req, res) => {
+  const { username, password } = req.body ?? {};
+  // Constant-time-style comparison via string equality is sufficient for static creds.
+  // Replace with a real DB + bcrypt comparison for production multi-user setups.
+  if (username !== AUTH_USER || password !== AUTH_PASS) {
+    return res.status(401).json({ error: "Invalid username or password" });
+  }
+  const token = jwt.sign({ sub: username, role: "user" }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
+  res.json({ token });
 });
 
-/* ── Placeholder: auth check (authentication disabled) ───── */
-app.get("/api/auth/check", (_req, res) => {
+/* ── Protected: verify a JWT (used for session restore on page load) ── */
+app.get("/api/auth/check", authenticateToken, (_req, res) => {
   res.json({ authenticated: true });
 });
 
-/* ── Placeholder: logout (authentication disabled) ───────── */
+/* ── Public: logout — token invalidation is client-side only ─ */
 app.post("/api/logout", (_req, res) => {
   res.json({ ok: true });
 });
@@ -62,7 +98,7 @@ function safePath(filename) {
 }
 
 /* ── Protected: list available XML scan files ─────────────── */
-app.get("/api/scans", (_req, res) => {
+app.get("/api/scans", authenticateToken, (_req, res) => {
   if (!fs.existsSync(SCANS_DIR)) {
     return res.json({ files: [], error: `Scans directory not found: ${SCANS_DIR}` });
   }
@@ -85,7 +121,7 @@ app.get("/api/scans", (_req, res) => {
 });
 
 /* ── Protected: fetch raw XML for a specific file ─────────── */
-app.get("/api/scans/:filename", (req, res) => {
+app.get("/api/scans/:filename", authenticateToken, (req, res) => {
   const filePath = safePath(req.params.filename);
 
   if (!filePath) {
@@ -106,7 +142,7 @@ app.get("/api/scans/:filename", (req, res) => {
 /* ── Protected: list scheduled scan configs ───────────────── */
 const CONFIG_DIR = path.join(SCANS_DIR, "config");
 
-app.get("/api/schedules", (_req, res) => {
+app.get("/api/schedules", authenticateToken, (_req, res) => {
   if (!fs.existsSync(CONFIG_DIR)) {
     return res.json({ schedules: [] });
   }

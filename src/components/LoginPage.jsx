@@ -30,7 +30,8 @@ export default function LoginPage({ onLogin }) {
       });
 
       if (res.ok) {
-        onLogin();
+        const data = await res.json();
+        onLogin(data.token);
       } else if (res.status === 401) {
         setError("Invalid username or password");
       } else if (res.status === 502 || res.status === 503 || res.status === 504) {

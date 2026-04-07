@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { Calendar, Clock, Tag, Crosshair, RefreshCw, Archive, Repeat, MapPin } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 const POLL_INTERVAL_MS = 30_000; // refresh every 30 s
 
@@ -10,13 +11,14 @@ const POLL_INTERVAL_MS = 30_000; // refresh every 30 s
  * a compact overview in the sidebar.
  */
 export default function ScheduledScans() {
+  const { apiFetch } = useAuth();
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
 
   const fetchSchedules = useCallback(async () => {
     try {
-      const res = await fetch("/api/schedules");
+      const res = await apiFetch("/api/schedules");
       if (!res.ok) return;
       const data = await res.json();
       setSchedules(data.schedules ?? []);
@@ -25,7 +27,7 @@ export default function ScheduledScans() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [apiFetch]);
 
   useEffect(() => {
     fetchSchedules();

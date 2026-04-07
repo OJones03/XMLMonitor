@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { RefreshCw, Server, CheckCircle, Timer } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 const POLL_INTERVAL_MS = 10_000; // refresh every 10 seconds
 
@@ -24,6 +25,7 @@ function parseInProgressMeta(name) {
  * Always visible — shows an idle state when no scans are running.
  */
 export default function ActiveScans() {
+  const { apiFetch } = useAuth();
   const [activeScans, setActiveScans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [, setTick] = useState(0);
@@ -36,7 +38,7 @@ export default function ActiveScans() {
 
   const fetchScans = useCallback(async () => {
     try {
-      const res = await fetch("/api/scans");
+      const res = await apiFetch("/api/scans");
       if (!res.ok) return;
       const data = await res.json();
       const inProgress = (data.files ?? []).filter((f) =>
@@ -48,7 +50,7 @@ export default function ActiveScans() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [apiFetch]);
 
   useEffect(() => {
     fetchScans();

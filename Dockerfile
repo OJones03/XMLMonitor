@@ -41,6 +41,6 @@ ENV PORT=3001 \
     NODE_ENV=production
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD wget -qO- http://localhost:3001/api/scans || exit 1
+    CMD wget -qO- http://localhost:3001/api/health || exit 1
 
 CMD ["node", "server/index.js"]

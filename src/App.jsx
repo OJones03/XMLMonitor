@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { LogOut } from "lucide-react";
 import elementLogo from "./assets/elementlogo.png";
 import { parseNmapXml } from "./lib/nmapParser";
 import { useHostFilter } from "./hooks/useHostFilter";
@@ -14,7 +15,9 @@ import PortOverview from "./components/PortOverview";
 import SettingsMenu from "./components/SettingsMenu";
 import DashboardView from "./components/DashboardView";
 import ScheduledScans from "./components/ScheduledScans";
+import LoginPage from "./components/LoginPage";
 import { useTheme } from "./contexts/ThemeContext";
+import { useAuth } from "./contexts/AuthContext";
 
 /**
  * Root application layout.
@@ -22,6 +25,7 @@ import { useTheme } from "./contexts/ThemeContext";
  */
 export default function App() {
   const { compact } = useTheme();
+  const { ready, isAuthenticated, login, logout } = useAuth();
 
   const [scanResult, setScanResult] = useState(null);
   const [currentFile, setCurrentFile] = useState(null);
@@ -52,6 +56,17 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
+      {/* ── Auth gate ──────────────────────────────────────────── */}
+      {!ready && (
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+          <span className="h-8 w-8 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
+        </div>
+      )}
+
+      {ready && !isAuthenticated && <LoginPage onLogin={login} />}
+
+      {ready && isAuthenticated && (
+        <>
       {/* ── Navbar ─────────────────────────────────────────────── */}
       <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950">
         <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-6 py-3">
@@ -64,6 +79,14 @@ export default function App() {
 
           <div className="flex items-center gap-3 text-xs text-slate-500">
             <SettingsMenu />
+            <button
+              onClick={logout}
+              className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition"
+              title="Sign out"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Sign out
+            </button>
           </div>
         </div>
       </header>
@@ -155,6 +178,8 @@ export default function App() {
         open={!!selectedHost}
         onClose={() => setSelectedHost(null)}
       />
+        </>
+      )}
     </div>
   );
 }
