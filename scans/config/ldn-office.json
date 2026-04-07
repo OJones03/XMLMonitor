@@ -1,7 +1,0 @@
-{
-  "SiteCode": "LDN",
-  "SiteName": "London_Office",
-  "CIDR": "172.16.0.0/24",
-  "Interval": "weekly",
-  "RetentionDays": 60
-}

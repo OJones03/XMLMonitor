@@ -1,7 +1,0 @@
-{
-  "SiteCode": "DEV",
-  "SiteName": "Dev_Lab",
-  "CIDR": "10.10.0.0/24",
-  "Interval": "monthly",
-  "RetentionDays": 180
-}
